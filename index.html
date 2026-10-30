@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thu học phí lớp 5A</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #eef3fb; color: #1f2a44;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif; font-size: 18px; line-height: 1.45;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
+  h1 { text-align: center; font-size: 28px; margin: 12px 0 18px; color: #1a56c4; }
+  h2 { font-size: 20px; margin: 0 0 12px; }
+  .card { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(30,60,120,.10); }
+  .fees { display: grid; gap: 10px; }
+  .fee {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 14px 16px; border: 2px solid #cfd9ee; border-radius: 12px; background: #f8faff;
+    font-size: 18px; text-align: left; cursor: pointer; width: 100%; color: inherit; font-family: inherit;
+  }
+  .fee .gia { font-weight: 700; color: #1a56c4; white-space: nowrap; }
+  .fee.chon { border-color: #1a56c4; background: #e3edff; }
+  input[type=search] {
+    width: 100%; padding: 14px 16px; font-size: 20px; border: 2px solid #cfd9ee; border-radius: 12px; outline: none; font-family: inherit;
+  }
+  input[type=search]:focus { border-color: #1a56c4; }
+  .students { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  @media (max-width: 420px) { .students { grid-template-columns: 1fr; } }
+  .hs {
+    padding: 14px 12px; border: 2px solid #cfd9ee; border-radius: 12px; background: #f8faff;
+    font-size: 18px; cursor: pointer; text-align: center; color: inherit; font-family: inherit;
+  }
+  .hs.chon { border-color: #14894a; background: #e2f6ea; font-weight: 700; }
+  .trong { grid-column: 1 / -1; text-align: center; color: #6b7690; padding: 12px; }
+  #khungQR { text-align: center; }
+  #khungQR img { width: 100%; max-width: 360px; border-radius: 12px; border: 1px solid #dfe6f4; background: #fff; }
+  .thongtin { text-align: left; margin: 14px auto 0; max-width: 420px; }
+  .dong { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed #d5ddee; }
+  .dong:last-child { border-bottom: none; }
+  .dong span:first-child { color: #5a6580; }
+  .dong span:last-child { font-weight: 700; text-align: right; word-break: break-word; }
+  .tien { color: #c0392b; font-size: 24px; }
+  .nut {
+    margin-top: 16px; padding: 16px 20px; width: 100%; max-width: 420px; font-size: 20px; font-weight: 700;
+    color: #fff; background: #1a56c4; border: none; border-radius: 12px; cursor: pointer; font-family: inherit;
+  }
+  .nut:active { background: #123f91; }
+  .luuy { margin-top: 12px; font-size: 16px; color: #5a6580; }
+  #thongBao { margin-top: 10px; color: #b45309; font-size: 16px; min-height: 1em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="tieuDe"></h1>
+
+  <section class="card">
+    <h2>1. Chọn khoản thu</h2>
+    <div id="khoanThu" class="fees"></div>
+  </section>
+
+  <section class="card">
+    <h2>2. Tìm và bấm tên con</h2>
+    <input id="timKiem" type="search" placeholder="Gõ tên con (có dấu hoặc không dấu)" autocomplete="off">
+    <div id="dsHocSinh" class="students"></div>
+  </section>
+
+  <section class="card" id="khungQR" hidden>
+    <h2 id="tieuDeQR"></h2>
+    <img id="anhQR" alt="Mã QR chuyển khoản">
+    <div class="thongtin">
+      <div class="dong"><span>Học sinh</span><span id="ttHocSinh"></span></div>
+      <div class="dong"><span>Khoản thu</span><span id="ttKhoan"></span></div>
+      <div class="dong"><span>Số tiền</span><span id="ttTien" class="tien"></span></div>
+      <div class="dong"><span>Chủ tài khoản</span><span id="ttChu"></span></div>
+      <div class="dong"><span>Ngân hàng</span><span id="ttNganHang"></span></div>
+      <div class="dong"><span>Số tài khoản</span><span id="ttSoTK"></span></div>
+      <div class="dong"><span>Nội dung chuyển khoản</span><span id="ttNoiDung"></span></div>
+    </div>
+    <button class="nut" id="nutLuu" type="button">Lưu ảnh QR</button>
+    <div id="thongBao"></div>
+    <div class="luuy">Quý phụ huynh vui lòng giữ nguyên số tiền và nội dung chuyển khoản.</div>
+  </section>
+</div>
+
+<script>
+/* ====== THÔNG TIN CẦN SỬA (nếu có thay đổi) ====== */
+var CAU_HINH = {
+  tieuDe: "Thu học phí lớp 5A",
+  nganHang: "MBBank",
+  soTaiKhoan: "0123456789",
+  chuTaiKhoan: "NGUYEN THI HOA",
+  tienTo: "HPT",
+  khoanThu: [
+    { ma: "HP11", ten: "Học phí tháng 11", soTien: 500000 },
+    { ma: "HP12", ten: "Học phí tháng 12", soTien: 500000 },
+    { ma: "QUY",  ten: "Quỹ lớp",          soTien: 100000 }
+  ],
+  hocSinh: [
+    "Nguyễn Minh Anh", "Trần Gia Bảo", "Lê Hoàng Dũng", "Phạm Thu Hà",
+    "Võ Ngọc Hân", "Đặng Quốc Huy", "Bùi Khánh Linh", "Hoàng Đức Minh",
+    "Ngô Bảo Ngọc", "Đỗ Thảo Nhi", "Phan Tuấn Phong", "Lý Thanh Trúc"
+  ]
+};
+/* ====== HẾT PHẦN CẦN SỬA ====== */
+
+function boDau(s) {
+  return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d").replace(/Đ/g, "D")
+    .toUpperCase().replace(/\s+/g, " ").trim();
+}
+function dinhDangTien(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ"; }
+
+var khoanDangChon = CAU_HINH.khoanThu[0];
+var hocSinhDangChon = null;
+
+var elKhoan = document.getElementById("khoanThu");
+var elTim = document.getElementById("timKiem");
+var elDS = document.getElementById("dsHocSinh");
+var elKhung = document.getElementById("khungQR");
+var elAnh = document.getElementById("anhQR");
+var elThongBao = document.getElementById("thongBao");
+
+document.getElementById("tieuDe").textContent = CAU_HINH.tieuDe;
+document.title = CAU_HINH.tieuDe;
+
+function veKhoanThu() {
+  elKhoan.innerHTML = "";
+  CAU_HINH.khoanThu.forEach(function (k) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "fee" + (k === khoanDangChon ? " chon" : "");
+    var t = document.createElement("span"); t.textContent = k.ten;
+    var g = document.createElement("span"); g.className = "gia"; g.textContent = dinhDangTien(k.soTien);
+    b.appendChild(t); b.appendChild(g);
+    b.onclick = function () { khoanDangChon = k; veKhoanThu(); capNhatQR(false); };
+    elKhoan.appendChild(b);
+  });
+}
+
+function veDanhSach() {
+  var tu = boDau(elTim.value);
+  elDS.innerHTML = "";
+  var dem = 0;
+  CAU_HINH.hocSinh.forEach(function (ten) {
+    if (tu && boDau(ten).indexOf(tu) === -1) return;
+    dem++;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "hs" + (ten === hocSinhDangChon ? " chon" : "");
+    b.textContent = ten;
+    b.onclick = function () { hocSinhDangChon = ten; veDanhSach(); capNhatQR(true); };
+    elDS.appendChild(b);
+  });
+  if (dem === 0) {
+    var d = document.createElement("div");
+    d.className = "trong";
+    d.textContent = "Không tìm thấy tên này trong danh sách.";
+    elDS.appendChild(d);
+  }
+}
+
+function noiDungCK() {
+  return CAU_HINH.tienTo + " " + khoanDangChon.ma + " " + boDau(hocSinhDangChon);
+}
+function duongDanQR() {
+  return "https://qr.sepay.vn/img?acc=" + encodeURIComponent(CAU_HINH.soTaiKhoan) +
+    "&bank=" + encodeURIComponent(CAU_HINH.nganHang) +
+    "&amount=" + encodeURIComponent(khoanDangChon.soTien) +
+    "&des=" + encodeURIComponent(noiDungCK()) +
+    "&template=compact";
+}
+
+function capNhatQR(cuon) {
+  elThongBao.textContent = "";
+  if (!hocSinhDangChon) { elKhung.hidden = true; return; }
+  elKhung.hidden = false;
+  document.getElementById("tieuDeQR").textContent = "Mã QR của em " + hocSinhDangChon;
+  elAnh.src = duongDanQR();
+  document.getElementById("ttHocSinh").textContent = hocSinhDangChon;
+  document.getElementById("ttKhoan").textContent = khoanDangChon.ten;
+  document.getElementById("ttTien").textContent = dinhDangTien(khoanDangChon.soTien);
+  document.getElementById("ttChu").textContent = CAU_HINH.chuTaiKhoan;
+  document.getElementById("ttNganHang").textContent = CAU_HINH.nganHang;
+  document.getElementById("ttSoTK").textContent = CAU_HINH.soTaiKhoan;
+  document.getElementById("ttNoiDung").textContent = noiDungCK();
+  if (cuon) elKhung.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+elAnh.onerror = function () {
+  elThongBao.textContent = "Chưa tải được ảnh QR. Vui lòng kiểm tra mạng và thử lại.";
+};
+
+document.getElementById("nutLuu").onclick = function () {
+  if (!hocSinhDangChon) return;
+  var url = duongDanQR();
+  var tenFile = "QR-" + khoanDangChon.ma + "-" + boDau(hocSinhDangChon).replace(/ /g, "-") + ".png";
+  elThongBao.textContent = "Đang tải ảnh...";
+  fetch(url)
+    .then(function (r) { if (!r.ok) throw new Error("loi"); return r.blob(); })
+    .then(function (blob) {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = tenFile;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      elThongBao.textContent = "Đã lưu ảnh: " + tenFile;
+    })
+    .catch(function () {
+      window.open(url, "_blank");
+      elThongBao.textContent = "Ảnh đã mở ở tab mới. Hãy nhấn giữ vào ảnh (hoặc bấm chuột phải) và chọn Lưu ảnh.";
+    });
+};
+
+elTim.addEventListener("input", veDanhSach);
+veKhoanThu();
+veDanhSach();
+</script>
+</body>
+</html>
